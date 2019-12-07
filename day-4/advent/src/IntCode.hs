@@ -43,10 +43,10 @@ execute = do pc <- use ic_PC
 execOp :: IntCode ()
 execOp = do OpInfo modes@(m3,m2,m1) code <- decodeOp <$> readPC
             case code of
-              1 -> execADD m1 m2
-              2 -> execMUL m1 m2
-              3 -> execRI m1
-              4 -> execWO m1
+              1 -> execAdd m1 m2
+              2 -> execMult m1 m2
+              3 -> execRD m1
+              4 -> execWR m1
               5 -> execJIT m1 m2
               6 -> execJIF m1 m2
               7 -> execLT m1 m2
@@ -78,11 +78,11 @@ execEQ = execBinOp (\x y -> fromEnum $ x == y)
 execLT :: Mode -> Mode -> IntCode ()
 execLT = execBinOp (\x y -> fromEnum $ x < y)
 
-execADD :: Mode -> Mode -> IntCode ()
-execADD = execBinOp (+)
+execAdd :: Mode -> Mode -> IntCode ()
+execAdd = execBinOp (+)
 
-execMUL :: Mode -> Mode -> IntCode ()
-execMUL = execBinOp (*)
+execMult :: Mode -> Mode -> IntCode ()
+execMult = execBinOp (*)
 
 execBinOp :: (Int -> Int -> Int) -> Mode -> Mode -> IntCode ()
 execBinOp f m1 m2 = do (x,y,dest) <- (,,) <$> arg m1 <*> arg m2 <*> arg IMM
@@ -91,13 +91,13 @@ execBinOp f m1 m2 = do (x,y,dest) <- (,,) <$> arg m1 <*> arg m2 <*> arg IMM
 --
 
 -- IO Operations
-execRI :: Mode -> IntCode ()
-execRI m = do dest <- arg IMM
-              readIn >>= writeAddr dest
+execRD :: Mode -> IntCode ()
+execRD m = do dest <- arg IMM
+                  readIn >>= writeAddr dest
 
-execWO:: Mode -> IntCode ()
-execWO m = do from <- arg m
-              writeOut from
+execWR :: Mode -> IntCode ()
+execWR m = do from <- arg m
+                    writeOut from
 
 arg :: Mode -> IntCode Int
 arg POS = readPC >>= readAddr
