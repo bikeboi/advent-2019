@@ -21,6 +21,8 @@ dependencies:
 - base >= 4.7 && < 5
 - mtl
 - microlens-platform
+- containers
+
 
 library:
   source-dirs: src
